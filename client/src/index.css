@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+.prize1 {
+  float: left;
+  width: 100%;
+}
+.prize2 {
+  float: left;
+  width: 50%;
+}
+.prize3 {
+  float: left;
+  width: 33.3%;
+}
+.prize4 {
+  float: left;
+  width: 25%;
+}
+
+.form-action {
+  text-align: center;
+}
+
+.link {
+  text-decoration: none;
+}
