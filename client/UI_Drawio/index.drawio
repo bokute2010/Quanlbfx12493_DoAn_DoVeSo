@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="BiI25BK-m004tcyKN06F" name="Home">
-        <mxGraphModel dx="789" dy="189" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="511" dy="307" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -137,7 +137,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="6eBlc0Ai_aLOYlobtlDm" name="Province">
-        <mxGraphModel dx="577" dy="230" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="511" dy="307" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="xpEyb_dkoKYqvDqRN8BN-0"/>
                 <mxCell id="xpEyb_dkoKYqvDqRN8BN-1" parent="xpEyb_dkoKYqvDqRN8BN-0"/>
@@ -636,7 +636,7 @@
         </mxGraphModel>
     </diagram>
     <diagram id="3q1Vfm8iJFg37b_ubcrl" name="Add Lottery">
-        <mxGraphModel dx="789" dy="189" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="511" dy="307" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="KQXujtF7CrqTz9I3SX7Y-0"/>
                 <mxCell id="KQXujtF7CrqTz9I3SX7Y-1" parent="KQXujtF7CrqTz9I3SX7Y-0"/>

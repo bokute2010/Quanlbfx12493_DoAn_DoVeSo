@@ -11,7 +11,7 @@ import PageNotFound from './PageNotFound';
 import SearchLottery from './SearchLottery/SearchLottery';
 import LotteryManager from './LotteryManager/LotteryManager';
 
-import { fetchProvinces, createLottery } from '../redux/Actions/LotteryActions';
+import { fetchProvinces, createLottery, deleteLottery, deleteMultiLottery, updateLottery } from '../redux/Actions/LotteryActions';
 import { connect } from 'react-redux';
 
 const mapStateToProps = state => {
@@ -22,7 +22,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => ({
     fetchProvinces: () => { dispatch(fetchProvinces()) },
-    createLottery: (lottery) => dispatch(createLottery(lottery))
+    createLottery: (lottery) => dispatch(createLottery(lottery)),
+    deleteLottery: (provinceId, lotteryId) => dispatch(deleteLottery(provinceId, lotteryId)),
+    deleteMultiLottery: (data) => dispatch(deleteMultiLottery(data)),
+    updateLottery: (provinceId, lottery) => dispatch(updateLottery(provinceId, lottery))
 })
 
 class Main extends Component {
@@ -47,7 +50,11 @@ class Main extends Component {
                             <LotteryManager
                                 provinces={this.props.provinces.provinces}
                                 createLottery={this.props.createLottery}
-                                n
+                                deleteLottery={this.props.deleteLottery}
+                                updateLottery={this.props.updateLottery}
+                                deleteMultiLottery={this.props.deleteMultiLottery}
+                                isLoading={this.props.provinces.isLoading}
+                                errMess={this.props.provinces.errMess}
                             />}
                     />
                     <Route path='*' element={<PageNotFound />} />
