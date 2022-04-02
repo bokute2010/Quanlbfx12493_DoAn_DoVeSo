@@ -1173,8 +1173,6 @@ function LotteryManager(props) {
 
                 </div>
 
-
-
                 <div className='container mt-5'>
 
                     <TabRenderLottery

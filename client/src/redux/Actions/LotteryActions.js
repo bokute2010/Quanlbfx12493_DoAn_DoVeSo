@@ -2,6 +2,22 @@ import axios from 'axios';
 import { baseURL } from '../../shared/baseURL';
 import * as ActionTypes from '../ActionTypes';
 
+
+const messageAlert = (method, message, className, numberDel) => {
+    document.getElementById('alert-div').style.display = '';
+
+    document.getElementById('alert-message').innerText = `${method} phần tử ${message}`;
+
+    numberDel ? document.getElementById('alert-message').innerText = `${method} ${numberDel} phần tử ${message}`
+        : document.getElementById('alert-message').innerText = `${method} phần tử ${message}`;
+
+    document.getElementById('alert-message').className = className;
+
+    setTimeout(function () {
+        document.getElementById('alert-div').style.display = 'none';
+    }, 5000)
+}
+
 export const deleteMultiLottery = (data) => async dispatch => {
 
     // Xóa hết các setimeout để tránh bị trùng
@@ -11,7 +27,6 @@ export const deleteMultiLottery = (data) => async dispatch => {
     }
 
     try {
-        //console.log(data)
         dispatch(loadingProvinces())
 
         return await axios.delete(baseURL + 'lottery/multidelete', { data: data })
@@ -19,26 +34,13 @@ export const deleteMultiLottery = (data) => async dispatch => {
             .then(provinces => {
                 dispatch(getProvinces(provinces));
 
-
-
                 //Alert khi delete thành công
-                document.getElementById('alert-div').style.display = '';
-                document.getElementById('alert-message').innerText = `Xóa ${data.length} phần tử thành công!`
-                document.getElementById('alert-message').className = 'alert alert-success'
-                setTimeout(function () {
-                    document.getElementById('alert-div').style.display = 'none';
-                }, 5000)
+                messageAlert('Xóa', 'thành công', 'alert alert-success', data.length)
             })
     } catch (error) {
         dispatch(getProvinces(error.response.data));
-
-        //Alert khi tạo thất bại
-        document.getElementById('alert-div').style.display = '';
-        document.getElementById('alert-message').innerText = 'Xóa thông tin thất bại'
-        document.getElementById('alert-message').className = 'alert alert-danger'
-        setTimeout(function () {
-            document.getElementById('alert-div').style.display = 'none';
-        }, 7000)
+        //Alert khi delete thất bại
+        messageAlert('Xóa', 'thất bại', 'alert alert-danger')
     }
 }
 
@@ -53,28 +55,18 @@ export const updateLottery = (provinceId, lottery) => async dispatch => {
     try {
         dispatch(loadingProvinces())
 
-        await axios.put(`${baseURL}lottery/?provinceId=${provinceId}`, lottery)
+        await axios.put(`${baseURL}lottery/?provinceId=${provinceId}`, lottery.g1)
             .then(response => response.data)
             .then(provinces => {
                 dispatch(getProvinces(provinces));
                 //Alert khi update thành công
-                document.getElementById('alert-div').style.display = '';
-                document.getElementById('alert-message').innerText = 'Cập nhật thông tin thành công!'
-                document.getElementById('alert-message').className = 'alert alert-success'
-                setTimeout(function () {
-                    document.getElementById('alert-div').style.display = 'none';
-                }, 7000)
+                messageAlert('Cập nhật', 'thành công', 'alert alert-success')
             })
     } catch (error) {
+        console.log('cc')
         dispatch(getProvinces(error.response.data));
-
         //Alert khi tạo thất bại
-        document.getElementById('alert-div').style.display = '';
-        document.getElementById('alert-message').innerText = 'Cập nhật thông tin thất bại'
-        document.getElementById('alert-message').className = 'alert alert-danger'
-        setTimeout(function () {
-            document.getElementById('alert-div').style.display = 'none';
-        }, 7000)
+        messageAlert('Cập nhật', 'thất bại', 'alert alert-danger')
     }
 }
 
@@ -94,26 +86,15 @@ export const deleteLottery = (provinceId, lotteryId) => async dispatch => {
             .then(provinces => {
                 dispatch(getProvinces(provinces));
                 //Alert khi delete thành công
-                document.getElementById('alert-div').style.display = '';
-                document.getElementById('alert-message').innerText = 'Xóa thông tin thành công!'
-                document.getElementById('alert-message').className = 'alert alert-success'
-                setTimeout(function () {
-                    document.getElementById('alert-div').style.display = 'none';
-                }, 5000)
+                messageAlert('Xóa', 'thành công', 'alert alert-success');
             })
     } catch (error) {
         dispatch(getProvinces(error.response.data));
 
         //Alert khi tạo thất bại
-        document.getElementById('alert-div').style.display = '';
-        document.getElementById('alert-message').innerText = 'Xóa thông tin thất bại'
-        document.getElementById('alert-message').className = 'alert alert-danger'
-        setTimeout(function () {
-            document.getElementById('alert-div').style.display = 'none';
-        }, 7000)
+        messageAlert('Xóa', 'thất bại', 'alert alert-danger');
     }
 }
-
 
 export const createLottery = (lottery) => async dispatch => {
 
@@ -131,91 +112,19 @@ export const createLottery = (lottery) => async dispatch => {
             .then(provinces => {
                 dispatch(getProvinces(provinces));
                 //Alert khi tạo thành công
-                document.getElementById('alert-div').style.display = '';
-                document.getElementById('alert-message').innerText = 'Thêm thông tin thành công!'
-                document.getElementById('alert-message').className = 'alert alert-success'
-                setTimeout(function () {
-                    document.getElementById('alert-div').style.display = 'none';
-                }, 7000)
+                messageAlert('Tạo', 'thành công', 'alert alert-success');
             })
     } catch (error) {
         dispatch(getProvinces(error.response.data));
-
         //Alert khi tạo thất bại
-        document.getElementById('alert-div').style.display = '';
-        document.getElementById('alert-message').innerText = 'Thêm thông tin thất bại'
-        document.getElementById('alert-message').className = 'alert alert-danger'
-        setTimeout(function () {
-            document.getElementById('alert-div').style.display = 'none';
-        }, 7000)
+        messageAlert('Tạo', 'thất bại', 'alert alert-danger');
     }
-
-    // .then(response => {
-    //     console.log(response.data.message)
-    //     //dispatch(getProvinces(response.data));
-    //     //return response
-
-    // })
-    // .then(response => {
-    //     if (response.status === 200) {
-    //         //Alert khi tạo thành công
-    //         document.getElementById('alert-div').style.display = '';
-    //         document.getElementById('alert-message').innerText = 'Thêm thông tin thành công!'
-    //         document.getElementById('alert-message').className = 'alert alert-success'
-
-    //         setTimeout(function () {
-    //             document.getElementById('alert-div').style.display = 'none';
-    //         }, 7000)
-
-
-    //     }
-
-    //     if (response.status === 201) {
-    //         console.log(response.data)
-    //         //Alert khi tạo thất bại
-    //         document.getElementById('alert-div').style.display = '';
-    //         document.getElementById('alert-message').innerText = 'Thêm thông tin thất bại'
-    //         document.getElementById('alert-message').className = 'alert alert-danger'
-    //         setTimeout(function () {
-    //             document.getElementById('alert-div').style.display = 'none';
-    //         }, 7000)
-    //     }
-
-    // })
-    // } catch (error) {
-    //     console.log(error)
-    // }
-
-
-    // return axios.post(baseURL + 'lottery', lottery)
-    //     .then(response => {
-    //         console.log(response);
-    //         if (response.status === 200) {
-    //             return response.data;
-    //         }
-    //         if (response.status === 201) {
-    //             return response.data;
-    //         }
-    //     })
-    //     .then(provinces => dispatch(getProvinces(provinces)))
-    //     .then(() => {
-    //         //Alert khi tạo thành công
-    //         document.getElementById('alert-div').style.display = '';
-    //         document.getElementById('alert-message').innerText = 'Thêm thông tin thành công!'
-    //         document.getElementById('alert-message').setAttribute('color', 'success')
-    //         setTimeout(function () {
-    //             document.getElementById('alert-div').style.display = 'none';
-    //         }, 7000)
-    //     })
-
-
 
 }
 
-
-export const fetchProvinces = () => dispatch => {
+export const fetchProvinces = () => async dispatch => {
     dispatch(loadingProvinces())
-    return axios.get(baseURL + 'provinces')
+    return await axios.get(baseURL + 'provinces')
         .then(response => {
             //console.log(response);
             return response;

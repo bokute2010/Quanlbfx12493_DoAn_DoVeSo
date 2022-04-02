@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Col, FormGroup, Label, Modal, ModalHeader, ModalBody, ModalFooter, Table, Row, Input } from 'reactstrap'
 import { Control, Errors, LocalForm } from 'react-redux-form'
 import './index.css';
-import moment from 'moment';
-import ModelUpdate from './ModelUpdate';
+import moment from 'moment'
+
+
+import { required, validNumber } from './validation-form';
 
 let multiDeleteDataGlobal = [];
-
 let isCheckBoxDeleteHidden = true;
 
-let lotteryUpdateGb;
-let provinceUpdateIdGb;
-let isUpdateOpenGb = true;
-
-
-
 function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
-    console.log(provinces)
     //Số thứ tự cho row
     let numberOrder = 0;
 
@@ -27,6 +21,8 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
     //Để lưu giá trị provinceId khi click update ở row => truyền xuống modal form update
     const [provinceUpdateId, setProvinceUpdateId] = useState()
     const [lotteryUpdate, setLotteryUpdate] = useState()
+    // let provinceUpdateId;
+    // let lotteryUpdate;
 
     //Hàm xử lý update
     function handleUpdate(values) {
@@ -54,8 +50,8 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
 
     }
 
-    //-----------------------------------------------------------------------------------------------
 
+    //#region Xử lý nút Xóa
     //Truyền data từ button xóa trong row
     const [dataDelete, setdataDelete] = useState([]);
 
@@ -70,16 +66,17 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
 
 
     }
-
-    //-----------------------------------------------------------------------------------------------
+    //#endregion
 
     function handleButtonUpdate(lottery, provinceId) {
-
-        console.log(lottery)
-        lotteryUpdateGb = lottery;
-        provinceUpdateIdGb = provinceId;
+        // console.log(lottery)
+        // lotteryUpdate = lottery
+        // provinceUpdateId = provinceId
+        setProvinceUpdateId(provinceId);
+        setLotteryUpdate(lottery)
 
     }
+    const [validationObject, setValidationObject] = useState({});
 
 
     const rows = provinces.map(province => {
@@ -107,7 +104,7 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
                             <td>
                                 <div className='row'>
                                     <div className='col-lg-6 my-1'>
-                                        <Button onClick={() => handleButtonUpdate(lottery, province._id)} block color='primary'>Cập nhật</Button>
+                                        <Button onClick={() => { handleButtonUpdate(lottery, province._id); toggleUpdate(); }} block color='primary'>Cập nhật</Button>
                                     </div>
                                     <div className='col-lg-6 my-1'>
                                         <Button onClick={() => { setdataDelete([province._id, lottery._id]); setIsConfirmDeleteOpen(true) }} block color='danger'>Xóa</Button>
@@ -173,29 +170,33 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
                 </ModalHeader>
                 <ModalBody>
                     {/*Form Miền Bắc */}
-                    <LocalForm onSubmit={(values) => handleUpdate(values,)}>
-                        {/* Ngày */}
-                        <Row className='form-group'>
-                            <Label sm={3} for='date'>Ngày</Label>
+                    <LocalForm onSubmit={(values) => handleUpdate(values)}>
+                        {/* Nhập Ngày */}
+                        <FormGroup row>
+                            <Label sm={3} htmlFor='.date'>Ngày</Label>
                             <Col sm={9}>
                                 <Control.text
+                                    id='.date'
                                     className='form-control'
-                                    type='date' model='.date'
+                                    type='date'
                                     defaultValue={lotteryUpdate ? moment(lotteryUpdate.date).format('YYYY-MM-DD') : null}
-                                    validators={{}}
+                                    model='.date'
+                                    max={moment(new Date()).format('YYYY-MM-DD')}
+                                    validators={{
+                                        required
+                                    }}
                                 />
                                 <Errors
                                     className="errors"
                                     model=".date"
                                     show="touched"
                                     messages={{
-
+                                        required: 'Không được để trống!'
                                     }}
-                                />
-                            </Col>
-                        </Row>
-                        <FormGroup row>
+                                >
 
+                                </Errors>
+                            </Col>
                         </FormGroup>
 
                         {/* Giải Đặc Biệt */}
@@ -204,50 +205,115 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
                             <Col sm={9}>
                                 <Control.text
                                     model='.special_prize'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.special_prize) : null}
+                                    id='special_prize'
                                     type='number'
                                     className='form-control'
                                     placeholder='number 1'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(5)
+                                    })}
+                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.special_prize) : null}
+                                    validators={validationObject}
+                                />
+                                <Errors
+                                    className="errors"
+                                    model=".special_prize"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 5 số!'
+                                    }}
                                 />
                             </Col>
                         </FormGroup>
 
                         {/* Giải 1 */}
                         <FormGroup row>
-                            <Label sm={3} for='g1'>Giải Nhất</Label>
+                            <Label sm={3} for='g1'>Giải 1</Label>
                             <Col sm={9}>
                                 <Control.text
                                     model='.g1'
+                                    id='g1'
                                     type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g1) : null}
                                     className='form-control'
                                     placeholder='number 1'
+                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g1) : null}
+                                    maxLength='5'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(5)
+                                    })}
+                                    validators={validationObject}
+                                />
+                                <Errors
+                                    className="errors"
+                                    model=".g1"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 5 số!'
+                                    }}
                                 />
                             </Col>
                         </FormGroup>
 
+
                         {/* Giải 2 */}
+
                         <FormGroup row>
-                            <Label sm={3} for='g2_1'>Giải Nhì</Label>
+                            <Label sm={3} for='g2_1'>Giải 2</Label>
                             <Col sm={4}>
                                 <Control.text
                                     model='.g2_1'
+                                    id='g2_1'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g2[0]) : null}
                                     className='form-control'
                                     placeholder='number 1'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(5)
+                                    })}
+                                    validators={validationObject}
+                                />
+                                <Errors
+                                    className="errors"
+                                    model=".g2_1"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 5 số!'
+                                    }}
                                 />
                             </Col>
+
                             <Col sm={5}>
                                 <Control.text
                                     model='.g2_2'
+                                    id='g2_2'
                                     type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g2[1]) : null}
                                     className='form-control'
                                     placeholder='number 2'
+                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g2[1]) : null}
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(5)
+                                    })}
+                                    validators={validationObject}
+                                />
+                                <Errors
+                                    className="errors"
+                                    model=".g2_2"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 5 số!'
+                                    }}
                                 />
                             </Col>
                         </FormGroup>
+
 
                         {/* Giải 3 */}
                         <FormGroup row>
@@ -255,32 +321,75 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
                             <Col sm={3}>
                                 <Control.text
                                     model='.g3_1'
+                                    id='g3_1'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[0]) : null}
                                     className='form-control'
                                     placeholder='number 1'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(5)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g3_1"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 5 số!'
+                                    }}
+                                />
                             </Col>
+
                             <Col sm={3}>
                                 <Control.text
                                     model='.g3_2'
+                                    id='g3_2'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[1]) : null}
                                     className='form-control'
                                     placeholder='number 2'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(5)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g3_2"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 5 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g3_3'
+                                    id='g3_3'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[2]) : null}
                                     className='form-control'
                                     placeholder='number 3'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(5)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g3_3"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 5 số!'
+                                    }}
+                                />
                             </Col>
                         </FormGroup>
                         <FormGroup row>
@@ -288,30 +397,73 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
                             <Col sm={3}>
                                 <Control.text
                                     model='.g3_4'
+                                    id='g3_4'
                                     type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[3]) : null}
+                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[4]) : null}
                                     className='form-control'
                                     placeholder='number 4'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(5)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g3_4"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 5 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g3_5'
+                                    id='g3_5'
                                     type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[4]) : null}
+                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[5]) : null}
                                     className='form-control'
                                     placeholder='number 5'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(5)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g3_5"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 5 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g3_6'
+                                    id='g3_6'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[5]) : null}
                                     className='form-control'
                                     placeholder='number 6'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(5)
+                                    })}
+                                    validators={validationObject}
+                                />
+                                <Errors
+                                    className="errors"
+                                    model=".g3_6"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 5 số!'
+                                    }}
                                 />
                             </Col>
                         </FormGroup>
@@ -322,77 +474,175 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
                             <Col sm={2}>
                                 <Control.text
                                     model='.g4_1'
+                                    id='g4_1'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g4[0]) : null}
                                     className='form-control'
                                     placeholder='number 1'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(4)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g4_1"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 4 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={2}>
                                 <Control.text
                                     model='.g4_2'
+                                    id='g4_2'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g4[1]) : null}
                                     className='form-control'
                                     placeholder='number 2'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(4)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g4_2"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 4 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={2}>
                                 <Control.text
                                     model='.g4_3'
+                                    id='g4_3'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g4[2]) : null}
                                     className='form-control'
                                     placeholder='number 3'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(4)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g4_3"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 4 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g4_4'
+                                    id='g4_4'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g4[3]) : null}
                                     className='form-control'
                                     placeholder='number 4'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(4)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g4_4"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 4 số!'
+                                    }}
+                                />
                             </Col>
                         </FormGroup>
 
                         {/* Giải 5 */}
                         <FormGroup row>
-                            <Label sm={3} for='g3_1'>Giải 5</Label>
+                            <Label sm={3} for='g5_1'>Giải 5</Label>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g5_1'
+                                    id='g5_1'
                                     type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[0]) : null}
+                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[1]) : null}
                                     className='form-control'
                                     placeholder='number 1'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(4)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g5_1"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 4 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g5_2'
+                                    id='g5_2'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[1]) : null}
                                     className='form-control'
                                     placeholder='number 2'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(4)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g5_2"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 4 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g5_3'
+                                    id='g5_3'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[2]) : null}
                                     className='form-control'
                                     placeholder='number 3'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(4)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g5_3"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 4 số!'
+                                    }}
+                                />
                             </Col>
                         </FormGroup>
                         <FormGroup row>
@@ -400,30 +650,73 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
                             <Col sm={3}>
                                 <Control.text
                                     model='.g5_4'
+                                    id='g5_4'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[3]) : null}
                                     className='form-control'
                                     placeholder='number 4'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(4)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g5_4"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 4 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g5_5'
+                                    id='g5_5'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[4]) : null}
                                     className='form-control'
                                     placeholder='number 5'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(4)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g5_5"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 4 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g5_6'
+                                    id='g5_6'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[5]) : null}
                                     className='form-control'
                                     placeholder='number 6'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(4)
+                                    })}
+                                    validators={validationObject}
+                                />
+                                <Errors
+                                    className="errors"
+                                    model=".g5_6"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 4 số!'
+                                    }}
                                 />
                             </Col>
                         </FormGroup>
@@ -434,32 +727,74 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
                             <Col sm={3}>
                                 <Control.text
                                     model='.g6_1'
+                                    id='g6_1'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g6[0]) : null}
                                     className='form-control'
                                     placeholder='number 1'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(3)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g6_1"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 3 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g6_2'
+                                    id='g6_2'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g6[1]) : null}
                                     className='form-control'
                                     placeholder='number 2'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(3)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g6_2"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 3 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g6_3'
+                                    id='g6_3'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g6[2]) : null}
                                     className='form-control'
                                     placeholder='number 3'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(3)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g6_3"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 3 số!'
+                                    }}
+                                />
                             </Col>
                         </FormGroup>
 
@@ -469,41 +804,98 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
                             <Col sm={2}>
                                 <Control.text
                                     model='.g7_1'
+                                    id='g7_1'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g7[0]) : null}
                                     className='form-control'
                                     placeholder='number 1'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(2)
+                                    })}
+                                    validators={validationObject}
+                                />
+                                <Errors
+                                    className="errors"
+                                    model=".g7_1"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 2 số!'
+                                    }}
                                 />
                             </Col>
                             <Col sm={2}>
                                 <Control.text
                                     model='.g7_2'
+                                    id='g7_2'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g7[1]) : null}
                                     className='form-control'
                                     placeholder='number 2'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(2)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g7_2"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 2 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={2}>
                                 <Control.text
                                     model='.g7_3'
+                                    id='g7_3'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g7[2]) : null}
                                     className='form-control'
                                     placeholder='number 3'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(2)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g7_3"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 2 số!'
+                                    }}
+                                />
                             </Col>
                             <Col sm={3}>
                                 <Control.text
                                     model='.g7_4'
+                                    id='g7_4'
                                     type='number'
                                     defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g7[3]) : null}
                                     className='form-control'
                                     placeholder='number 4'
+                                    onFocus={() => setValidationObject({
+                                        required,
+                                        validNumber: validNumber(2)
+                                    })}
+                                    validators={validationObject}
                                 />
-
+                                <Errors
+                                    className="errors"
+                                    model=".g7_4"
+                                    show="touched"
+                                    messages={{
+                                        required: 'Không được để trống!',
+                                        validNumber: 'Yêu cầu đủ 2 số!'
+                                    }}
+                                />
                             </Col>
                         </FormGroup>
 
@@ -518,492 +910,15 @@ function RenderRowTable({ provinces, deleteLottery, updateLottery }) {
 
                 </ModalBody>
             </Modal>
+
         </>
 
     );
 }
 
-function RenderSpecifyProvince({ province, deleteLottery, updateLottery }) {
-
-    //Số thứ tự cho row
-    let numberOrder = 0;
-
-
-    //UseState open update modal
-    const [isUpdateOpen, setIsUpdateOpen] = useState(false);
-    const toggleUpdate = () => { setIsUpdateOpen(!isUpdateOpen) };
-
-    //Để lưu giá trị provinceId khi click update ở row => truyền xuống modal form update
-    const [provinceUpdateId, setProvinceUpdateId] = useState()
-    const [lotteryUpdate, setLotteryUpdate] = useState()
-
-    //Hàm xử lý update
-    function handleUpdate(values) {
-        const g2 = [values.g2_1, values.g2_2];
-        const g3 = [values.g3_1, values.g3_2, values.g3_3, values.g3_4, values.g3_5, values.g3_6];
-        const g4 = [values.g4_1, values.g4_2, values.g4_3, values.g4_4];
-        const g5 = [values.g5_1, values.g5_2, values.g5_3, values.g5_4, values.g5_5, values.g5_6];
-        const g6 = [values.g6_1, values.g6_2, values.g6_3];
-        const g7 = [values.g7_1, values.g7_2, values.g7_3, values.g7_4];
-
-        const lottery = {
-            _id: lotteryUpdate._id,
-            date: values.date,
-            special_prize: values.special_prize,
-            g1: values.g1,
-            g2: g2,
-            g3: g3,
-            g4: g4,
-            g5: g5,
-            g6: g6,
-            g7: g7
-        }
-        updateLottery(provinceUpdateId, lottery);
-        toggleUpdate();
-    }
-
-    // Modal confirm
-    const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
-    const toggleConfirm = () => { setIsConfirmDeleteOpen(!isConfirmDeleteOpen) }
-
-    //Truyền data từ button xóa trong row
-    const [dataDelete, setdataDelete] = useState([]);
-
-    //Xử lý thao tác xóa dữ liệu
-    function handleDelete(provinceId, lotteryId) {
-
-        deleteLottery(provinceId, lotteryId)
-
-    }
-
-    const specifyLotteries = province.lottery.map(lottery => {
-        numberOrder++;
-        return (
-            <tr key={lottery._id}>
-                <th scope="row">
-                    {numberOrder}
-                </th>
-                <td>
-                    {province.province}
-                </td>
-                <td>
-                    {moment(lottery.date).format('DD-MM-YYYY')}
-                </td>
-                <td>
-                    {lottery.special_prize}
-                </td>
-                <td>
-                    <div className='row'>
-                        <div className='col-lg-6 my-1'>
-                            <Button onClick={() => { setIsUpdateOpen(true); setProvinceUpdateId(province._id); setLotteryUpdate(lottery) }} block color='primary'>Cập nhật</Button>
-                        </div>
-                        <div className='col-lg-6 my-1'>
-                            <Button onClick={() => { setdataDelete([province._id, lottery._id]); setIsConfirmDeleteOpen(true) }} block color='danger'>Xóa</Button>
-                        </div>
-                    </div>
-
-                </td>
-
-                {/* Checkbox delete */}
-                <td hidden={isCheckBoxDeleteHidden} className='text-center'>
-                    <Input size={'lg'}
-                        className='checkboxDelete'
-                        type="checkbox"
-                        onClick={() => {
-                            multiDeleteDataGlobal = [...multiDeleteDataGlobal, { provinceId: province._id, lotteryId: lottery._id }]
-                        }}
-                    />
-                </td>
-
-            </tr>
-        )
-    })
-
-    return (
-        <>
-            {specifyLotteries}
-
-            {/* Modal delete */}
-            <Modal isOpen={isConfirmDeleteOpen} >
-                <ModalHeader toggle={toggleConfirm}>Xác Nhận</ModalHeader>
-                <ModalBody>Bạn có chắc chắn muốn xóa thông tin này?</ModalBody>
-                <ModalFooter>
-                    <Button
-                        color="primary"
-                        onClick={() => { handleDelete(dataDelete[0], dataDelete[1]) }}
-                    >
-                        OK
-                    </Button>
-                    {' '}
-                    <Button onClick={toggleConfirm}>
-                        Cancel
-                    </Button>
-                </ModalFooter>
-            </Modal>
-
-            {/* Modal Update */}
-            <Modal size='lg' isOpen={isUpdateOpen}>
-                <ModalHeader toggle={toggleUpdate}>
-                    Thêm Vé Dò
-                </ModalHeader>
-                <ModalBody>
-                    {/*Form Miền Bắc */}
-                    <LocalForm onSubmit={(values) => handleUpdate(values,)}>
-                        {/* Ngày */}
-                        <FormGroup row>
-                            <Label sm={3} for='date'>Ngày</Label>
-                            <Col sm={9}>
-                                <Control.text
-                                    className='form-control'
-                                    type='date' model='.date'
-                                    defaultValue={lotteryUpdate ? moment(lotteryUpdate.date).format('YYYY-MM-DD') : null}
-                                    validators={{
-
-                                    }}
-                                />
-                                <Errors
-                                    className="errors"
-                                    model=".date"
-                                    show="touched"
-                                    messages={{
-
-                                    }}
-                                />
-                            </Col>
-                        </FormGroup>
-
-
-
-                        {/* Giải Đặc Biệt */}
-                        <FormGroup row>
-                            <Label sm={3} for='special_prize'>Giải Đặc Biệt</Label>
-                            <Col sm={9}>
-                                <Control.text
-                                    model='.special_prize'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.special_prize) : null}
-                                    type='number'
-                                    className='form-control'
-                                    placeholder='number 1'
-                                />
-                            </Col>
-                        </FormGroup>
-
-                        {/* Giải 1 */}
-                        <FormGroup row>
-                            <Label sm={3} for='g1'>Giải Nhất</Label>
-                            <Col sm={9}>
-                                <Control.text
-                                    model='.g1'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g1) : null}
-                                    className='form-control'
-                                    placeholder='number 1'
-                                />
-                            </Col>
-                        </FormGroup>
-
-                        {/* Giải 2 */}
-                        <FormGroup row>
-                            <Label sm={3} for='g2_1'>Giải Nhì</Label>
-                            <Col sm={4}>
-                                <Control.text
-                                    model='.g2_1'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g2[0]) : null}
-                                    className='form-control'
-                                    placeholder='number 1'
-                                />
-                            </Col>
-                            <Col sm={5}>
-                                <Control.text
-                                    model='.g2_2'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g2[1]) : null}
-                                    className='form-control'
-                                    placeholder='number 2'
-                                />
-                            </Col>
-                        </FormGroup>
-
-                        {/* Giải 3 */}
-                        <FormGroup row>
-                            <Label sm={3} for='g3_1'>Giải 3</Label>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g3_1'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[0]) : null}
-                                    className='form-control'
-                                    placeholder='number 1'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g3_2'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[1]) : null}
-                                    className='form-control'
-                                    placeholder='number 2'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g3_3'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[2]) : null}
-                                    className='form-control'
-                                    placeholder='number 3'
-                                />
-
-                            </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                            <Label sm={3}></Label>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g3_4'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[3]) : null}
-                                    className='form-control'
-                                    placeholder='number 4'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g3_5'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[4]) : null}
-                                    className='form-control'
-                                    placeholder='number 5'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g3_6'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g3[5]) : null}
-                                    className='form-control'
-                                    placeholder='number 6'
-                                />
-                            </Col>
-                        </FormGroup>
-
-                        {/* Giải 4 */}
-                        <FormGroup row>
-                            <Label sm={3} for='g4_1'>Giải 4</Label>
-                            <Col sm={2}>
-                                <Control.text
-                                    model='.g4_1'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g4[0]) : null}
-                                    className='form-control'
-                                    placeholder='number 1'
-                                />
-
-                            </Col>
-                            <Col sm={2}>
-                                <Control.text
-                                    model='.g4_2'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g4[1]) : null}
-                                    className='form-control'
-                                    placeholder='number 2'
-                                />
-
-                            </Col>
-                            <Col sm={2}>
-                                <Control.text
-                                    model='.g4_3'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g4[2]) : null}
-                                    className='form-control'
-                                    placeholder='number 3'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g4_4'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g4[3]) : null}
-                                    className='form-control'
-                                    placeholder='number 4'
-                                />
-
-                            </Col>
-                        </FormGroup>
-
-                        {/* Giải 5 */}
-                        <FormGroup row>
-                            <Label sm={3} for='g3_1'>Giải 5</Label>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g5_1'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[0]) : null}
-                                    className='form-control'
-                                    placeholder='number 1'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g5_2'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[1]) : null}
-                                    className='form-control'
-                                    placeholder='number 2'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g5_3'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[2]) : null}
-                                    className='form-control'
-                                    placeholder='number 3'
-                                />
-
-                            </Col>
-                        </FormGroup>
-                        <FormGroup row>
-                            <Label sm={3}></Label>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g5_4'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[3]) : null}
-                                    className='form-control'
-                                    placeholder='number 4'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g5_5'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[4]) : null}
-                                    className='form-control'
-                                    placeholder='number 5'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g5_6'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g5[5]) : null}
-                                    className='form-control'
-                                    placeholder='number 6'
-                                />
-                            </Col>
-                        </FormGroup>
-
-                        {/* Giải 6 */}
-                        <FormGroup row>
-                            <Label sm={3} for='g6_1'>Giải 6</Label>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g6_1'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g6[0]) : null}
-                                    className='form-control'
-                                    placeholder='number 1'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g6_2'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g6[1]) : null}
-                                    className='form-control'
-                                    placeholder='number 2'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g6_3'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g6[2]) : null}
-                                    className='form-control'
-                                    placeholder='number 3'
-                                />
-
-                            </Col>
-                        </FormGroup>
-
-                        {/* Giải 7 */}
-                        <FormGroup row>
-                            <Label sm={3} for='g7_1'>Giải 7</Label>
-                            <Col sm={2}>
-                                <Control.text
-                                    model='.g7_1'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g7[0]) : null}
-                                    className='form-control'
-                                    placeholder='number 1'
-                                />
-                            </Col>
-                            <Col sm={2}>
-                                <Control.text
-                                    model='.g7_2'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g7[1]) : null}
-                                    className='form-control'
-                                    placeholder='number 2'
-                                />
-
-                            </Col>
-                            <Col sm={2}>
-                                <Control.text
-                                    model='.g7_3'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g7[2]) : null}
-                                    className='form-control'
-                                    placeholder='number 3'
-                                />
-
-                            </Col>
-                            <Col sm={3}>
-                                <Control.text
-                                    model='.g7_4'
-                                    type='number'
-                                    defaultValue={lotteryUpdate ? parseInt(lotteryUpdate.g7[3]) : null}
-                                    className='form-control'
-                                    placeholder='number 4'
-                                />
-
-                            </Col>
-                        </FormGroup>
-
-                        <Button color='primary' type='submit'>
-                            Cập nhật
-                        </Button>
-                        {' '}
-                        <Button onClick={toggleUpdate}>
-                            Hủy
-                        </Button>
-                    </LocalForm>
-
-                </ModalBody>
-            </Modal>
-        </>
-
-    )
-}
-
 const RenderNorthLottery = ({ northProvinces, deleteLottery, updateLottery, deleteMultiLottery }) => {
 
-
-
-    const [isLotteryShow, setLotteryShow] = useState(false);
+    const [isSpecifyLotteryShow, setIsSpecifyLotteryShow] = useState(false);
     const [specifyProvince, setSpecifyProvince] = useState([]);
 
     const [isAllLotteryShow, setAllLotteryShow] = useState(true);
@@ -1015,7 +930,7 @@ const RenderNorthLottery = ({ northProvinces, deleteLottery, updateLottery, dele
                 <Button
                     block
                     color='primary'
-                    onClick={() => { setLotteryShow(true); setSpecifyProvince([province]); setAllLotteryShow(false) }}>{province.province}
+                    onClick={() => { setIsSpecifyLotteryShow(true); setSpecifyProvince([province]); setAllLotteryShow(false) }}>{province.province}
                 </Button>
             </div>
         )
@@ -1062,6 +977,8 @@ const RenderNorthLottery = ({ northProvinces, deleteLottery, updateLottery, dele
 
     return (
         <>
+
+
             {/* Add button */}
             <div className='container my-5'>
                 <div className='row'>
@@ -1069,7 +986,7 @@ const RenderNorthLottery = ({ northProvinces, deleteLottery, updateLottery, dele
                         <Button
                             block
                             color='primary'
-                            onClick={() => { setAllLotteryShow(true); setLotteryShow(false) }}>
+                            onClick={() => { setAllLotteryShow(true); setIsSpecifyLotteryShow(false) }}>
                             Miền Bắc
                         </Button>
                     </div>
@@ -1122,8 +1039,7 @@ const RenderNorthLottery = ({ northProvinces, deleteLottery, updateLottery, dele
                         </tr>
                     </thead>
                     <tbody>
-                        {/* {isLotteryShow ? <RenderSpecifyProvince updateLottery={updateLottery} deleteLottery={deleteLottery} province={specifyProvince} /> : null} */}
-                        {isLotteryShow ? <RenderRowTable updateLottery={updateLottery} deleteLottery={deleteLottery} provinces={specifyProvince} /> : null}
+                        {isSpecifyLotteryShow ? <RenderRowTable updateLottery={updateLottery} deleteLottery={deleteLottery} provinces={specifyProvince} /> : null}
 
                         {isAllLotteryShow ? <RenderRowTable updateLottery={updateLottery} deleteLottery={deleteLottery} provinces={northProvinces} /> : null}
                     </tbody>
@@ -1147,13 +1063,7 @@ const RenderNorthLottery = ({ northProvinces, deleteLottery, updateLottery, dele
                     </ModalFooter>
                 </Modal>
 
-                {/* Modal Update */}
-                {/* {isUpdateOpenGb ? <ModelUpdate
-                    lotteryUpdate={lotteryUpdateGb}
-                    provinceUpdateId={provinceUpdateIdGb}
-                    updateLottery={updateLottery}
-                /> : null
-                } */}
+
             </div>
 
 
