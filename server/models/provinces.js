@@ -115,8 +115,18 @@ ProvinceSchema.methods.deleteMultiLottery = async function (data) {
 ProvinceSchema.methods.addLottery = async function (lottery) {
     try {
         const oldlotteries = [...this.lottery];
-        oldlotteries.push(lottery);
+        oldlotteries.unshift(lottery);
         this.lottery = oldlotteries;
+        await this.save();
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
+ProvinceSchema.methods.resetData = async function () {
+    try {
+        this.lottery = [];
         await this.save();
     } catch (error) {
         console.log(error)

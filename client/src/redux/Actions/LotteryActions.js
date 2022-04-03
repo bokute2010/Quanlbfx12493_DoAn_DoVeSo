@@ -55,7 +55,7 @@ export const updateLottery = (provinceId, lottery) => async dispatch => {
     try {
         dispatch(loadingProvinces())
 
-        await axios.put(`${baseURL}lottery/?provinceId=${provinceId}`, lottery.g1)
+        await axios.put(`${baseURL}lottery/?provinceId=${provinceId}`, lottery)
             .then(response => response.data)
             .then(provinces => {
                 dispatch(getProvinces(provinces));
