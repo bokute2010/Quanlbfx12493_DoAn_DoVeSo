@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const UserSchema = new Schema({
+const AdminSchema = new Schema({
     username: {
         type: String,
         required: true,
@@ -22,7 +22,7 @@ const UserSchema = new Schema({
     },
     phone: {
         type: String,
-        required: true
+        required: false
     },
     historyChecks: [
         {
@@ -50,17 +50,5 @@ const UserSchema = new Schema({
     }
 })
 
-// UserSchema.methods.resetPassword = function(userId){
-//     const users = 
-// }
 
-UserSchema.methods.addHistory = function (userLottery) {
-
-    const updatedHistory = [...this.historyChecks];
-    updatedHistory.push(userLottery);
-    this.historyChecks = updatedHistory;
-    return this.save();
-
-}
-
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('Admin', AdminSchema);

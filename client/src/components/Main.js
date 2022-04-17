@@ -10,6 +10,8 @@ import LotterySouth from './LotteryShow/South/LotterySouth';
 import PageNotFound from './PageNotFound';
 import SearchLottery from './SearchLottery/SearchLottery';
 import LotteryManager from './LotteryManager/LotteryManager';
+import UserManager from './UserManager/UserManager';
+import { actions } from 'react-redux-form';
 
 import { fetchProvinces, createLottery, deleteLottery, deleteMultiLottery, updateLottery } from '../redux/Actions/LotteryActions';
 import { connect } from 'react-redux';
@@ -25,7 +27,10 @@ const mapDispatchToProps = dispatch => ({
     createLottery: (lottery) => dispatch(createLottery(lottery)),
     deleteLottery: (provinceId, lotteryId) => dispatch(deleteLottery(provinceId, lotteryId)),
     deleteMultiLottery: (data) => dispatch(deleteMultiLottery(data)),
-    updateLottery: (provinceId, lottery) => dispatch(updateLottery(provinceId, lottery))
+    updateLottery: (provinceId, lottery) => dispatch(updateLottery(provinceId, lottery)),
+    resetNorthForm: () => dispatch(actions.reset('northForm')),
+    resetSouthCentralForm: () => dispatch(actions.reset('southCentralForm'))
+
 })
 
 class Main extends Component {
@@ -39,7 +44,8 @@ class Main extends Component {
                 <Header />
                 <Routes>
                     <Route exact path='/' element={<Home />} />
-                    <Route exact path='/login' element={<Login />} />
+                    <Route exact path='/login' element={<Login isAdmin={false} />} />
+                    <Route exact path='/login/admin' element={<Login isAdmin={true} />} />
                     <Route exact path='/signup' element={<Signup />} />
                     <Route exact path='/region/north' element={<LotteryNorth />} />
                     <Route exact path='/region/central' element={<LotteryCentral />} />
@@ -55,8 +61,11 @@ class Main extends Component {
                                 deleteMultiLottery={this.props.deleteMultiLottery}
                                 isLoading={this.props.provinces.isLoading}
                                 errMess={this.props.provinces.errMess}
+                                resetNorthForm={this.props.resetNorthForm}
+                                resetSouthCentralForm={this.props.resetSouthCentralForm}
                             />}
                     />
+                    <Route exact path='/admin/user-manager' element={<UserManager />} />
                     <Route path='*' element={<PageNotFound />} />
                 </Routes>
             </>

@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { Button, Col, Form, FormGroup, Input, Label, Modal, ModalBody, ModalHeader } from 'reactstrap'
-import { Control, Errors, LocalForm } from 'react-redux-form';
+import { Button, Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader } from 'reactstrap'
+import { Control, Errors, Form } from 'react-redux-form';
 import { Loading } from '../Loading'
-import moment from 'moment'
+import moment from 'moment';
 
-import { isPositive, required, validNumber } from './validation-form'
-import RenderManagerLottery from './RenderManagerLottery'
+import { isPositive, required, validNumber } from '../validation-form'
+import RenderLottery from './RenderLottery';
 
 
 function SelectProvinces({ provinces }) {
@@ -65,27 +65,23 @@ function TabRenderLottery({ northProvinces, centralProvinces, southProvinces, de
 
             </ul>
 
-            {isNorthLotteryShow ? <RenderManagerLottery
+            {/* 4/4 RenderManagerLottery => RenderLottery */}
+            {isNorthLotteryShow ? <RenderLottery
                 region={'north'}
-                deleteMultiLottery={deleteMultiLottery}
-                deleteLottery={deleteLottery}
                 provinces={northProvinces}
                 updateLottery={updateLottery} />
                 : null
             }
 
-            {isCentralLotteryShow ? <RenderManagerLottery
+            {isCentralLotteryShow ? <RenderLottery
                 region={'central'}
-                deleteMultiLottery={deleteMultiLottery}
-                deleteLottery={deleteLottery}
                 provinces={centralProvinces}
                 updateLottery={updateLottery} />
                 : null
             }
-            {isSouthLotteryShow ? <RenderManagerLottery
+            {isSouthLotteryShow ? <RenderLottery
                 region={'south'}
                 deleteMultiLottery={deleteMultiLottery}
-                deleteLottery={deleteLottery}
                 provinces={southProvinces}
                 updateLottery={updateLottery} />
                 : null
@@ -95,6 +91,9 @@ function TabRenderLottery({ northProvinces, centralProvinces, southProvinces, de
 }
 
 function LotteryManager(props) {
+
+    console.log('run');
+
     function region() {
         const region = document.getElementById('region').value;
         if (region === 'north') {
@@ -141,7 +140,7 @@ function LotteryManager(props) {
 
     //Hàm xử lý giá trị của LocalForm trả về
     const handleSubmit = (values) => {
-        console.log(values)
+        //console.log(values)
         toggle();
         props.createLottery(values)
     }
@@ -169,6 +168,7 @@ function LotteryManager(props) {
                         </div>
                     </div>
 
+                    {/* Button và modal thêm vé dò */}
                     <div className='container'>
                         <Button size='lg' color='primary' onClick={toggle}>Tạo xổ số mới</Button>
                         <Modal size='lg' isOpen={isOpen}>
@@ -176,31 +176,32 @@ function LotteryManager(props) {
                                 THÊM THÔNG TIN VÉ SỐ
                             </ModalHeader>
                             <ModalBody>
+
                                 {/*Select Vùng Miền*/}
-                                <Form>
-                                    <FormGroup row>
-                                        <Label md={3} for='region'><b>Chọn Miền</b></Label>
-                                        <Col md={9}>
-                                            <Input onChange={region} id='region' name='region' type='select'>
-                                                <option selected >
-                                                    ---Chọn Miền
-                                                </option>
-                                                <option value='north'>
-                                                    Miền Bắc
-                                                </option>
-                                                <option value='central'>
-                                                    Miền Trung
-                                                </option>
-                                                <option value='south'>
-                                                    Miền Nam
-                                                </option>
-                                            </Input>
-                                        </Col>
-                                    </FormGroup>
-                                </Form>
+
+                                <FormGroup row>
+                                    <Label md={3} for='region'><b>Chọn Miền</b></Label>
+                                    <Col md={9}>
+                                        <Input onChange={region} id='region' name='region' type='select'>
+                                            <option selected >
+                                                ---Chọn Miền
+                                            </option>
+                                            <option value='north'>
+                                                Miền Bắc
+                                            </option>
+                                            <option value='central'>
+                                                Miền Trung
+                                            </option>
+                                            <option value='south'>
+                                                Miền Nam
+                                            </option>
+                                        </Input>
+                                    </Col>
+                                </FormGroup>
+
 
                                 {/*Form Miền Bắc */}
-                                <LocalForm onSubmit={(values) => handleSubmit(values)} id='northForm' style={{ 'display': 'none' }}>
+                                <Form model='northForm' onSubmit={(values) => handleSubmit(values)} id='northForm' style={{ 'display': 'none' }}>
                                     <Control.text model='.region' type='hidden' defaultValue={'north'} className='form-control' />
 
                                     {/* Tỉnh thành */}
@@ -247,10 +248,10 @@ function LotteryManager(props) {
                                             <Control.text
                                                 model='.special_prize'
                                                 id='special_prize'
+                                                name='special_prize'
                                                 type='number'
                                                 className='form-control'
                                                 placeholder='number 1'
-                                                maxLength='5'
                                                 validators={{
                                                     required,
                                                     validNumber: validNumber(5),
@@ -277,6 +278,7 @@ function LotteryManager(props) {
                                             <Control.text
                                                 model='.g1'
                                                 id='g1'
+                                                name='g1'
                                                 type='number'
                                                 className='form-control'
                                                 placeholder='number 1'
@@ -956,10 +958,26 @@ function LotteryManager(props) {
                                     <Button color='primary' type='submit'>
                                         Tạo mới
                                     </Button>
-                                </LocalForm>
+                                    {' '}
+                                    <Button onClick={() => { props.resetNorthForm(); toggle() }}>
+                                        Hủy
+                                    </Button>
+                                    {' '}
+                                    <Button
+                                        onClick={() => {
+                                            props.resetNorthForm();
+                                        }}
+                                        type='button'
+                                        color='danger'>
+                                        Reset
+                                    </Button>
 
-                                {/* Form Miền Trung*/}
-                                <LocalForm onSubmit={(values) => handleSubmit(values)} id='centralSouthForm' style={{ 'display': 'none' }}>
+                                    {/* {' '}
+                                    <Button onClick={handleResetNorthForm} type='button' color='danger'>Reset</Button> */}
+                                </Form>
+
+                                {/* Form Miền Trung và Nam*/}
+                                <Form model='southCentralForm' onSubmit={(values) => handleSubmit(values)} id='centralSouthForm' style={{ 'display': 'none' }}>
                                     {/* Hidden value */}
                                     <Control.text model='.region' defaultValue={'centralSouth'} type='hidden' />
 
@@ -1074,7 +1092,7 @@ function LotteryManager(props) {
                                         <Col sm={3}>
                                             <Control.text
                                                 model='.g6_1'
-                                                id='g6'
+                                                id='g6_1'
                                                 type='number'
                                                 className='form-control'
                                                 placeholder='number 1'
@@ -1178,11 +1196,11 @@ function LotteryManager(props) {
 
                                     {/* Giải 4 */}
                                     <FormGroup row>
-                                        <Label sm={3} for='g4'><b>Giải 4</b></Label>
+                                        <Label sm={3} for='g4_1'><b>Giải 4</b></Label>
                                         <Col sm={3}>
                                             <Control.text
                                                 model='.g4_1'
-                                                id='g4'
+                                                id='g4_1'
                                                 type='number'
                                                 className='form-control'
                                                 placeholder='number 1'
@@ -1363,7 +1381,6 @@ function LotteryManager(props) {
                                         </Col>
                                     </FormGroup>
 
-
                                     {/* Giải 3 */}
                                     <FormGroup row>
                                         <Label sm={3} for='g3'><b>Giải 3</b></Label>
@@ -1514,16 +1531,23 @@ function LotteryManager(props) {
                                     <Button color='primary' type='submit'>
                                         Tạo mới
                                     </Button>
-                                </LocalForm>
-
-
+                                    {' '}
+                                    <Button onClick={() => { props.resetSouthCentralForm(); toggle() }}>
+                                        Hủy
+                                    </Button>
+                                    {' '}
+                                    <Button
+                                        onClick={() => {
+                                            props.resetSouthCentralForm();
+                                        }}
+                                        type='button'
+                                        color='danger'>
+                                        Reset
+                                    </Button>
+                                </Form>
                             </ModalBody>
                         </Modal>
                     </div>
-                    {/* Button và modal thêm vé dò */}
-
-
-
                 </div>
 
                 <div className='container mt-5'>

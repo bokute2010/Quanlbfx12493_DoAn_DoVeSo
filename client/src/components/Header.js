@@ -1,8 +1,8 @@
 import React from 'react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import {
-    Button, Nav, Navbar, NavbarBrand, NavbarToggler, Collapse, NavLink, NavItem,
+    Button, Nav, Navbar, NavbarBrand, NavbarToggler, Collapse, NavItem,
     UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem
 } from 'reactstrap';
 
@@ -26,7 +26,7 @@ function Header() {
                 <Collapse isOpen={isOpen} navbar>
                     <Nav className="me-auto" navbar>
                         <NavItem>
-                            <NavLink to={"/"}>
+                            <NavLink className='nav-link' to={"/"}>
                                 Trang Chủ
                             </NavLink>
                         </NavItem>
@@ -59,26 +59,31 @@ function Header() {
                         </UncontrolledDropdown>
 
                         <NavItem>
-                            <NavLink href="/search-lottery">
+                            <NavLink className='nav-link' to={'/'} >
                                 Dò vé
                             </NavLink>
                         </NavItem>
 
                         <NavItem>
-                            <NavLink href="">
+                            <NavLink className='nav-link' to={'/'}>
                                 Lịch sử dò vé
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink href="">
+                            <NavLink className='nav-link' to={'/admin/user-manager'} >
                                 Quản lý User
                             </NavLink>
                         </NavItem>
+
                         <NavItem>
-                            <Link to={"/lottery-manager"} >
+                            <NavLink className='nav-link' to={'/lottery-manager'}>
                                 Quản lý Vé dò
-                            </Link>
+                            </NavLink>
                         </NavItem>
+
+
+
+
                     </Nav>
                     <div className="me-0 d-flex justify-content-center">
                         <Link to={'/signup'}>
